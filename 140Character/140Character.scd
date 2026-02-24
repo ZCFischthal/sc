@@ -1,0 +1,1 @@
+{Pan2.ar(CombN.ar(SinOsc.ar(Duty.ar(MouseX.kr(1/20, 1/2),0,Dshuf([466, 554, 622, 740, 831]*(MouseY.kr(0.3, 1.2)), inf)))))}.play;

@@ -1,25 +1,20 @@
 (
 //VARIABLES
 var counter = 0;
-var autoSnailsNum = 0;
 var factorySpeed = 4;
 var factories = 0;
 var factoryCost = 20;
 var upgrades = 0;
 var upgradeCost = 40;
-var audioLayers = 0;
-var milestoneReached = 0;
-var curEvent = ~harmony;
-
-
+var autoSnailsBegun = false;
 
 //FUNCTIONS
 ~counterUpdate = {
 	counter.postln;
 	c.string = "🐌: " + counter;
-	if (counter > 5, {if (milestoneReached < 1, {b.visible = true; a.visible = false; milestoneReached = milestoneReached + 1;})});
-	if (counter > factoryCost, {if(milestoneReached < 2, {d.visible = true; milestoneReached = milestoneReached + 1;})});
-	if (counter > upgradeCost, {if (milestoneReached < 3, {f.visible = true; milestoneReached = milestoneReached + 1;})});
+	if (counter > 5, {b.visible = true; a.visible = false;});
+	if (counter > factoryCost, {d.visible = true;});
+	if (counter > upgradeCost, {f.visible = true;});
 };
 
 ~counterOne = {
@@ -36,8 +31,8 @@ var curEvent = ~harmony;
 	~clock.value;
 	~clock = {AppClock.sched(factorySpeed,
 		{ |time|
-			//["AppClock has been playing for ", time].postln;
-			counter = counter + autoSnailsNum;
+			["AppClock has been playing for ", time].postln;
+			counter = counter + factories;
 			~counterUpdate.value;
 			~clock.value;
 	    });
@@ -47,19 +42,12 @@ var curEvent = ~harmony;
 ~buyAutoSnails = {
 	if (counter > factoryCost, {
 		counter = counter - factoryCost;
-		autoSnailsNum = autoSnailsNum + 1;
-		counter = counter + autoSnailsNum;
 		~counterUpdate.value;
 		factories = factories + 1;
 		factoryCost = factoryCost + (factoryCost/2);
 		d.string = "Buy Factory for " + factoryCost + "🐌: (" + factories + ")";
-		if (factories == 1, {~autoSnails.value;});
-	}, {e.string = "Not enough 🐌";
-		AppClock.sched(2.0,
-			{ |time|
-				e.visible = false;
-		});
-	});
+		if (autoSnailsBegun ==false, {~autoSnails.value; autoSnailsBegun = true;});
+	}, {e.string = "Not enough 🐌"; ~errorMessage.value;});
 };
 
 ~upgradeFactory = {
@@ -70,16 +58,18 @@ var curEvent = ~harmony;
 		upgrades = upgrades + 1;
 		upgradeCost = upgradeCost + (upgradeCost/2);
 		f.string = "Upgrade Factory for " + upgradeCost + "🐌: (" + upgrades + ")";
+	}, {e.string = "Not enough 🐌"; ~errorMessage.value;});
+};
+
+~errorMessage = {
+	e.visible = true;
+	AppClock.sched(2.0,
+		{|time|
+			e.visible = false;
 	});
 };
 
-~tempo = {
-	TempoBusClock.tempo(120 + counter);
-};
-
-
-
-//BUTTONS
+//GUI
 a = Button.new().string_("Buy 🐌").action_(~counterOne);
 b = Button.new().string_("Buy 🐌🐌").action_(~counterTwo);
 d = Button.new().string_("Buy Factory for " + factoryCost + "🐌: (" + factories + ")").action_(~buyAutoSnails);
@@ -87,20 +77,18 @@ f = Button.new().string_("Upgrade Factory for " + upgradeCost + "🐌: (" + upgr
 
 d.visible = false;
 b.visible = false;
-e.visible = false;
 f.visible = false;
 
-//TEXT
 c = StaticText.new().string_("🐌: " + counter);
-e = StaticText.new();
+e = StaticText.new().string_("");
 
-
-
-//MAKE WINDOW
 w = Window.new("🐌 Ester's Escargot 🐌").background_(Color.white).layout_(
     VLayout(
-		HLayout( c, e ),
-		HLayout(a, b, d, f)
+		HLayout( c, e),
+		f,
+		d,
+		b,
+		a
     )
 ).front;
 )

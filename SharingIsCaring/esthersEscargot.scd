@@ -7,15 +7,21 @@ var factoryCost = 20;
 var upgrades = 0;
 var upgradeCost = 40;
 var achievement = 0;
+var curAchievement = 0;
 
 //FUNCTIONS
 ~counterUpdate = {
 	counter.postln;
 	x = Synth("doubleBass");
 	c.string = "🐌: " + counter;
-	if (counter > 5, {if (achievement < 1, {b.visible = true; a.visible = false; ~audioLayers.value;});});
+	~nextAchievement.value;
+	//curAchievement.interpret;
+	/*nextAchievement = curAchievement.asCompileString;
+	if (nextAchievement == true, {"nextAchievementTrue".postln; ~nextAchievement.value;});*/
+	//if (curAchievement == true, {~nextAchievement.value;});
+	/*if (counter > 5, {if (achievement < 1, {b.visible = true; a.visible = false; ~audioLayers.value;});});
 	if (counter > factoryCost, {if (achievement < 2, {d.visible = true; ~audioLayers.value;});});
-	if (counter > upgradeCost, {if (achievement < 3, {f.visible = true; ~audioLayers.value;});});
+	if (counter > upgradeCost, {if (achievement < 3, {f.visible = true; ~audioLayers.value;});});*/
 };
 
 ~counterOne = {
@@ -51,7 +57,7 @@ var achievement = 0;
 		factories = factories + 1;
 		factoryCost = factoryCost + (factoryCost/2);
 		d.string = "Buy Factory for " + factoryCost + "🐌: (" + factories + ")";
-		if (factories == 1, {~autoSnails.value; "called AutoSnails".postln; counter = counter + 1;});
+		if (factories == 1, {~autoSnails.value; "called AutoSnails".postln; counter = counter + 1; ~audioLayers.value;});
 	}, {e.string = "Not enough 🐌"; ~errorMessage.value;});
 };
 
@@ -73,6 +79,14 @@ var achievement = 0;
 		{|time|
 			e.visible = false;
 	});
+};
+
+~nextAchievement = {
+	switch (curAchievement,
+		0, {if (counter > 5, {~audioLayers.value; curAchievement = curAchievement + 1; b.visible = true; a.visible = false;})},
+		1, {if (counter > factoryCost, {~audioLayers.value; curAchievement = curAchievement + 1; d.visible = true;})},
+		2, {if (counter > upgradeCost, {~audioLayers.value; curAchievement = curAchievement + 1; f.visible = true;})}
+	);
 };
 
 ~audioLayers = {
@@ -381,17 +395,17 @@ metadata: (
 
 
 //GUI
-a = Button.new().string_("Buy 🐌").action_(~counterOne);
-b = Button.new().string_("Buy 🐌🐌").action_(~counterTwo);
-d = Button.new().string_("Buy Factory for " + factoryCost + "🐌: (" + factories + ")").action_(~buyAutoSnails);
-f = Button.new().string_("Upgrade Factory for " + upgradeCost + "🐌: (" + upgrades + ")").action_(~upgradeFactory);
+a = Button.new().string_("Buy 🐌").font_(Font(size:15)).action_(~counterOne);
+b = Button.new().string_("Buy 🐌🐌").font_(Font(size:15)).action_(~counterTwo);
+d = Button.new().string_("Buy Factory for " + factoryCost + "🐌: (" + factories + ")").font_(Font(size:15)).action_(~buyAutoSnails);
+f = Button.new().string_("Upgrade Factory for " + upgradeCost + "🐌: (" + upgrades + ")").font_(Font(size:15)).action_(~upgradeFactory);
 
 d.visible = false;
 b.visible = false;
 f.visible = false;
 
-c = StaticText.new().string_("🐌: " + counter);
-e = StaticText.new().string_("");
+c = StaticText.new().string_("🐌: " + counter).font_(Font(size:50));
+e = StaticText.new().string_("").font_(Font(size:30));
 
 w = Window.new("🐌 Ester's Escargot 🐌").background_(Color.new(0.3, 0.2, 1, 0.3)).layout_(
     VLayout(

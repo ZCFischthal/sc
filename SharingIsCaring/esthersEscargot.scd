@@ -6,7 +6,6 @@ var factories = 0;
 var factoryCost = 20;
 var upgrades = 0;
 var upgradeCost = 40;
-var autoSnailsBegun = false;
 var achievement = 0;
 
 //FUNCTIONS
@@ -29,17 +28,21 @@ var achievement = 0;
 	~counterUpdate.value;
 };
 
+
 ~autoSnails = {
+	"autoSnails".postln;
+	factorySpeed.postln;
 	~clock.value;
-	~clock = {AppClock.sched(factorySpeed,
+};
+
+~clock = {AppClock.sched(factorySpeed,
 		{ |time|
-			["AppClock has been playing for ", time].postln;
+			//["AppClock has been playing for ", time].postln;
 			counter = counter + factories;
 			~counterUpdate.value;
 			~clock.value;
 	    });
 	};
-};
 
 ~buyAutoSnails = {
 	if (counter > factoryCost, {
@@ -48,9 +51,10 @@ var achievement = 0;
 		factories = factories + 1;
 		factoryCost = factoryCost + (factoryCost/2);
 		d.string = "Buy Factory for " + factoryCost + "🐌: (" + factories + ")";
-		if (autoSnailsBegun ==false, {~autoSnails.value; autoSnailsBegun = true; counter = counter + 1;});
+		if (factories == 1, {~autoSnails.value; "called AutoSnails".postln; counter = counter + 1;});
 	}, {e.string = "Not enough 🐌"; ~errorMessage.value;});
 };
+
 
 ~upgradeFactory = {
 	if (counter > upgradeCost, {

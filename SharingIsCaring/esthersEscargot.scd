@@ -15,13 +15,6 @@ var curAchievement = 0;
 	x = Synth("doubleBass");
 	c.string = "🐌: " + counter;
 	~nextAchievement.value;
-	//curAchievement.interpret;
-	/*nextAchievement = curAchievement.asCompileString;
-	if (nextAchievement == true, {"nextAchievementTrue".postln; ~nextAchievement.value;});*/
-	//if (curAchievement == true, {~nextAchievement.value;});
-	/*if (counter > 5, {if (achievement < 1, {b.visible = true; a.visible = false; ~audioLayers.value;});});
-	if (counter > factoryCost, {if (achievement < 2, {d.visible = true; ~audioLayers.value;});});
-	if (counter > upgradeCost, {if (achievement < 3, {f.visible = true; ~audioLayers.value;});});*/
 };
 
 ~counterOne = {
@@ -54,6 +47,7 @@ var curAchievement = 0;
 	if (counter > factoryCost, {
 		counter = counter - factoryCost;
 		~counterUpdate.value;
+		~buyColor.value;
 		factories = factories + 1;
 		factoryCost = factoryCost + (factoryCost/2);
 		d.string = "Buy Factory for " + factoryCost + "🐌: (" + factories + ")";
@@ -98,7 +92,16 @@ var curAchievement = 0;
 		3, {~snare.unmute},
 		4, {~hihat.unmute}
 	);
+	~buyColor.value;
 	achievement = achievement + 1;
+};
+
+~buyColor = {
+	w.background = Color.new(0, 0.6, 0.5, 0.6);
+	AppClock.sched(1,
+		{|time|
+			w.background = ~ogColor;
+	});
 };
 
 //INSTRUMENTS
@@ -407,7 +410,9 @@ f.visible = false;
 c = StaticText.new().string_("🐌: " + counter).font_(Font(size:50));
 e = StaticText.new().string_("").font_(Font(size:30));
 
-w = Window.new("🐌 Ester's Escargot 🐌").background_(Color.new(0.3, 0.2, 1, 0.3)).layout_(
+~ogColor = Color.new(0, 1, 0.5, 0.3);
+
+w = Window.new("🐌 Ester's Escargot 🐌").background_(~ogColor).layout_(
     VLayout(
 		HLayout( c, e),
 		f,

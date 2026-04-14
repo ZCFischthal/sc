@@ -8,6 +8,10 @@ var upgrades = 0;
 var upgradeCost = 40;
 var achievement = 0;
 var curAchievement = 0;
+var managerCost = 90;
+var managers = 0;
+
+var myManagers = List.new();
 
 //FUNCTIONS
 ~counterUpdate = {
@@ -67,6 +71,37 @@ var curAchievement = 0;
 	}, {e.string = "Not enough 🐌"; ~errorMessage.value;});
 };
 
+~buyManager = {
+	if (counter > managerCost, {
+		if(managers < 1, {~managerDuty.value;});
+		managers  = managers + 1;
+		g.string = "Buy Manager for " + managerCost + "🐌: (" + managers + ")";
+		counter = counter - managerCost;
+		~counterUpdate.value;
+		myManagers = myManagers.add(~newButton.value);
+		managers.postln;
+	}, {e.string= "Not enough 🐌"; ~errorMessage.value;});
+};
+
+~managerDuty = {
+	AppClock.sched(5.0,
+		{|time|
+			counter = counter - (managers * 0.5);
+			if (managers > 0, {~counterUpdate.value;});
+			if (counter > factoryCost, {~buyAutoSnails.value; "manager bought".postln;});
+			~managerDuty.value;
+	});
+
+};
+
+~newButton = {Button.new(w, Rect(0, 0)).string_("Manager" + managers).states_([
+			["Manager Working", Color.black, Color.green],
+			["Manager Off", Color.gray, Color.clear]
+		]).action_({|me|
+	me.value.postln;
+	if (me.value == 0, {managers = managers + 1;}, {managers = managers - 1;});
+	("managers: " + managers).postln;};);};
+
 ~errorMessage = {
 	e.visible = true;
 	AppClock.sched(2.0,
@@ -79,7 +114,8 @@ var curAchievement = 0;
 	switch (curAchievement,
 		0, {if (counter > 5, {~audioLayers.value; curAchievement = curAchievement + 1; b.visible = true; a.visible = false;})},
 		1, {if (counter > factoryCost, {~audioLayers.value; curAchievement = curAchievement + 1; d.visible = true;})},
-		2, {if (counter > upgradeCost, {~audioLayers.value; curAchievement = curAchievement + 1; f.visible = true;})}
+		2, {if (counter > upgradeCost, {~audioLayers.value; curAchievement = curAchievement + 1; f.visible = true;})},
+		3, {if (counter > managerCost, {~audioLayers.value; curAchievement = curAchievement + 1; g.visible = true;})}
 	);
 };
 
@@ -346,7 +382,7 @@ metadata: (
 //AUDIO
 (
 ~bassline = Pbind(
-	\degree, Pseq([0, -1, -2, -3], inf),
+	\degree, Pseq([Pseq([Pseq([0, -1, -2, -3], 3), -1, 0, 1, -3], 2), [-2, 0, 2], [-3, 0, 2], [-3.9, 0, 2], [-5, 0, 2]], inf),
     \dur, 2,
 	\instrument, \cs80leadMH;
 ).play;
@@ -354,15 +390,15 @@ metadata: (
 
 (
 ~harmony = Pbind(
-	\degree, Pseq([Rest(1), 4, 9, 4], inf),
-    \dur, 0.5,
+	\degree, Pseq([Pseq([Pseq([Rest(1), 4, 9, 4], 4), Pseq([Rest(1), 3.9, 8, 3.9], 4), Pseq([Rest(1), 4, 9, 4], 4), Rest(1), 4, 8, 4, Rest(1), 4, 9, 4, Pseq([Rest(1), 4, 10, 4], 2)], 2), 9, 3.9, 4, 5, 6, 2, 3.9, 4, 5, 2, 3.9, 4, 3.9, 4.9, 6, 10.9], inf),
+	\dur, 0.5,
 	\instrument, \cs80leadMH;
 ).play;
 );
 
 (
 ~bassline2 = Pbind(
-	\degree, Pseq([-7, -8, -9, -10], inf),
+	\degree, Pseq([Pseq([Pseq([0, -1, -2, -3], 3), -1, 0, 1, -3], 2), [-2, 0, 2], [-3, 0, 2], [-3.9, 0, 2], [-5, 0, 2]], inf),
     \dur, 2,
 	\instrument, \cs80leadMH;
 ).play;
@@ -398,27 +434,39 @@ metadata: (
 
 
 //GUI
-a = Button.new().string_("Buy 🐌").font_(Font(size:15)).action_(~counterOne);
+a = Button.new().font_(Font(size:15)).action_(~counterOne).states_([["Buy 🐌", Color.black, Color.new(0, 0.5, 0.5)]]);
 b = Button.new().string_("Buy 🐌🐌").font_(Font(size:15)).action_(~counterTwo);
 d = Button.new().string_("Buy Factory for " + factoryCost + "🐌: (" + factories + ")").font_(Font(size:15)).action_(~buyAutoSnails);
 f = Button.new().string_("Upgrade Factory for " + upgradeCost + "🐌: (" + upgrades + ")").font_(Font(size:15)).action_(~upgradeFactory);
+g = Button.new().string_("Buy Manager for " + managerCost + "🐌: (" + managers + ")").font_(Font(size:15)).action_(~buyManager);
 
 d.visible = false;
 b.visible = false;
 f.visible = false;
+g.visible = false;
+
+d.mouseEnterAction_({d.string_("Factory makes more 🐌 every" + factorySpeed + "seconds");});
+d.mouseLeaveAction_({d.string_("Buy Factory for " + factoryCost + "🐌: (" + factories + ")");});
+f.mouseEnterAction_({f.string_("Factory now makes 🐌 every" + (factorySpeed/2) + "seconds");});
+f.mouseLeaveAction_({f.string_("Upgrade Factory for " + upgradeCost + "🐌: (" + upgrades + ")");});
+g.mouseEnterAction_({g.string_("Manager buys factories if affordable. Salary is 0.5 🐌 per 5  seconds");});
+g.mouseLeaveAction_({g.string_("Buy Manager for " + managerCost + "🐌: (" + managers + ")");});
 
 c = StaticText.new().string_("🐌: " + counter).font_(Font(size:50));
-e = StaticText.new().string_("").font_(Font(size:30));
+e = StaticText.new().string_("").font_(Font(size:30)).stringColor_(Color.red);
+
 
 ~ogColor = Color.new(0, 1, 0.5, 0.3);
 
-w = Window.new("🐌 Ester's Escargot 🐌").background_(~ogColor).layout_(
+w = Window.new("🐌 Esther's Escargot 🐌").background_(~ogColor).layout_(
     VLayout(
-		HLayout( c, e),
+		x = HLayout( c, e),
+		g,
 		f,
 		d,
 		b,
 		a
     )
 ).front;
+
 )

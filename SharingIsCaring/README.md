@@ -4513,3 +4513,97 @@ w = Window.new("🐌 Ester's Escargot 🐌").background_(~ogColor).layout_(
 ).front;
 )
 ```
+
+
+Going to do speech or at least see about it
+
+https://doc.sccode.org/Classes/Speech.html
+ok nevermind it seems like this doesn't work anymore
+
+instead I want to try and get hover text
+so supercollider uses qt
+which i'm guessing means that qt stuff should transfer over?
+
+https://docs.supercollider.online/Guides/News-Qt-GUI.html
+
+mouseEnterAction and mouseLeaveAction
+going to try it 
+
+ok this is working
+I just need to figure out a way to have the text show up where the mouse is
+
+I thought maybe mousex.kr and mousey.kr but alas that has not worked
+
+https://github.com/supercollider/supercollider/issues/237
+this actually works way better ("w.acceptsMouseOver = true" and "a.mouseOverAction_({//action}))
+
+but still doesn't solve the problem of having the text actually appear
+ugh no i hate all this
+
+ok I added the manager
+gotta figure out how to add some achievements that are non-linear, also
+instead of that annoying switch statement
+I still feel like an array of strings
+maybe if we have an array of strings, evaluate all of them, and then when a string turns out true, we get rid of that string in the array?
+
+
+ok I'm back
+So, bad news — manager duty isn't working right
+It's continually buying even when we're under the limit
+I think what I actually want to do though is turn the manager on/off
+So, you have to monitor it
+
+OH WAIT it totally is working right, the managers are just way too expensive lmao
+ok no it wasnt but i fixed it
+basically, i wasn't updating the actual counter visual, but the counter variable had updated and so it was confusing
+anyway
+
+https://www.reddit.com/r/supercollider/comments/gyxv7n/difficulty_using_object_button_for_multiple/
+trying this so you can turn manager on and off
+not working
+
+```
+Button.new(w, Rect(0, 0)).string_("Manager" + managers).states_([
+			["Manager Working", Color.black, Color.green],
+			["Manager Off", Color.gray, Color.clear]
+		]).action_({arg self;
+			var myState = self.value;
+			switch (myState,
+				myState == 1, {managers = managers + 1},
+				myState == 2, {managers = managers - 1}
+		);};
+		("managers: " + managers).postln;
+		);
+```
+
+ok idk what i did really but i'm able to add and take away the manager by clicking the button
+
+```
+Button.new(w, Rect(0, 0)).string_("Manager" + managers).states_([
+			["Manager Working", Color.black, Color.green],
+			["Manager Off", Color.gray, Color.clear]
+		]).action_({|me|
+	me.value.postln;
+	if (me.value == 0, {managers = managers + 1;}, {managers = managers - 1;});
+	("managers: " + managers).postln;};);
+```
+
+slay it's working!!!!
+man this cookie clicker sure is complex
+
+ok I made the music fancier too
+just realized i never actually made it so when the manager is off duty they can't buy anything lmao
+
+ok future things to do:
+- manager doesn't buy when off duty (some way of running "~buyAutoSnails" as many times as we have managers — some kind of loop)
+- change tempo so the music starts ramping up with the # of snails
+- hover text on the buttons so it's clearer what they do
+
+WAIT actually instead of hover text, let's do the thing we had before but just change the text so that it's the explanation
+
+```
+d.mouseEnterAction_({d.string_("Factory makes more 🐌 every" + factorySpeed + "seconds");});
+d.mouseLeaveAction_({d.string_("Buy Factory for " + factoryCost + "🐌: (" + factories + ")");});
+```
+Delightful
+

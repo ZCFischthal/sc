@@ -1,3 +1,10 @@
+/*
+Angelica and I played it and encountered following issues:
+Manager continues to buy even when turned off
+Factory speed increases exponentially, which is fine except that the counter up noise is called too often — need to have it only click at the thousands/hundreds once you  reach a certain speed
+Need to round factory cost and upgrade cost to integer so they don't make counter weird float
+*/
+
 (
 //VARIABLES
 var counter = 0;
@@ -128,12 +135,12 @@ var myManagers = List.new();
 		3, {~snare.unmute},
 		4, {~hihat.unmute}
 	);
-	~buyColor.value;
+	//~buyColor.value;
 	achievement = achievement + 1;
 };
 
 ~buyColor = {
-	w.background = Color.new(0, 0.6, 0.5, 0.6);
+	w.background = Color.new(0.5, 0.65, 0.5);
 	AppClock.sched(1,
 		{|time|
 			w.background = ~ogColor;
@@ -434,11 +441,11 @@ metadata: (
 
 
 //GUI
-a = Button.new().font_(Font(size:15)).action_(~counterOne).states_([["Buy 🐌", Color.black, Color.new(0, 0.5, 0.5)]]);
-b = Button.new().string_("Buy 🐌🐌").font_(Font(size:15)).action_(~counterTwo);
-d = Button.new().string_("Buy Factory for " + factoryCost + "🐌: (" + factories + ")").font_(Font(size:15)).action_(~buyAutoSnails);
-f = Button.new().string_("Upgrade Factory for " + upgradeCost + "🐌: (" + upgrades + ")").font_(Font(size:15)).action_(~upgradeFactory);
-g = Button.new().string_("Buy Manager for " + managerCost + "🐌: (" + managers + ")").font_(Font(size:15)).action_(~buyManager);
+a = Button.new().font_(Font(size:15)).action_(~counterOne).states_([["Buy 🐌", Color.black, Color.new(1, 0.87, 1)]]);
+b = Button.new().font_(Font(size:15)).action_(~counterTwo).states_([["Buy 🐌🐌", Color.black, Color.new(1, 0.87, 1)]]);
+d = Button.new().states_([["Buy Factory for " + factoryCost + "🐌: (" + factories + ")", Color.new(1, 0.87, 1), Color.new(0.5, 0.65, 0.5)]]).font_(Font(size:15)).action_(~buyAutoSnails);
+f = Button.new().states_([["Upgrade Factory for " + upgradeCost + "🐌: (" + upgrades + ")", Color.new(1, 0.87, 1), Color.new(0.5, 0.65, 0.5)]]).font_(Font(size:15)).action_(~upgradeFactory);
+g = Button.new().states_([["Buy Manager for " + managerCost + "🐌: (" + managers + ")", Color.new(1, 0.87, 1), Color.new(0.5, 0.35, 0.5)]]).font_(Font(size:15)).action_(~buyManager);
 
 d.visible = false;
 b.visible = false;
@@ -452,11 +459,11 @@ f.mouseLeaveAction_({f.string_("Upgrade Factory for " + upgradeCost + "🐌: (" 
 g.mouseEnterAction_({g.string_("Manager buys factories if affordable. Salary is 0.5 🐌 per 5  seconds");});
 g.mouseLeaveAction_({g.string_("Buy Manager for " + managerCost + "🐌: (" + managers + ")");});
 
-c = StaticText.new().string_("🐌: " + counter).font_(Font(size:50));
+c = StaticText.new().string_("🐌: " + counter).font_(Font(size:50)).stringColor_(Color.new(1, 0.87, 1));
 e = StaticText.new().string_("").font_(Font(size:30)).stringColor_(Color.red);
 
 
-~ogColor = Color.new(0, 1, 0.5, 0.3);
+~ogColor = Color.new(0.5, 0.5, 0.5);
 
 w = Window.new("🐌 Esther's Escargot 🐌").background_(~ogColor).layout_(
     VLayout(
